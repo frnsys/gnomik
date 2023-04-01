@@ -10,7 +10,7 @@ export function tryTakeAction(key: ActionName): boolean {
   let actions = api.actions.get();
   let action = actions[key];
 
-  if (action.requires && !tryPayResources(action.requires)) {
+  if (action.requires && Object.values(action.requires).some((v) => v > 0) && !tryPayResources(action.requires)) {
     return false;
   }
 

@@ -24,7 +24,7 @@ export const initialState: State = {
   resources: {
     energy: {
       value: 12,
-      rate: -1,
+      rate: 0,
     },
     hamburgers: {
       value: 10,
@@ -108,6 +108,14 @@ export const initialState: State = {
     }
   }, {
     type: 'action',
+    action: 'makeHamburger',
+    consequence: {
+      type: 'gainResource',
+      name: 'hamburgers',
+      value: 1,
+    }
+  }, {
+    type: 'action',
     action: 'eatHamburger',
     consequence: {
       type: 'gainResource',
@@ -128,6 +136,14 @@ export const initialState: State = {
     consequence: {
       type: 'changeRate',
       name: 'mushrooms',
+      value: 1,
+    }
+  }, {
+    type: 'action',
+    action: 'think',
+    consequence: {
+      type: 'gainResource',
+      name: 'thoughts',
       value: 1,
     }
   }]

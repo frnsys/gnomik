@@ -1,9 +1,11 @@
 import api from './engine/api';
+import { slugify } from './util';
 import { numFmt } from './format';
-import { ActionName } from './engine/state';
-import { For, createSignal } from 'solid-js';
+import { Action, ActionName } from './engine/state';
+import { Show, For, createSignal } from 'solid-js';
 import { icons } from './Resources';
 import { tryTakeAction } from './engine/logic';
+import update from 'immutability-helper';
 
 const inject = (str: string, obj: Object) => str.replace(/\${(.*?)}/g, (x,g)=> obj[g]);
 
@@ -46,7 +48,7 @@ export default function Actions() {
       {([name, data]) => {
         return <div class="action" onClick={() => !data.targeted && doAction(name)}>
           <div class="action-name">{data.name}</div>
-          {data.requires && <div class="action-requires">Requires
+          {data.requires && Object.values(data.requires).some((v) => v > 0) && <div class="action-requires">Requires
             <For each={Object.entries(data.requires)}>
               {([name, amount]) => {
                 return <div class="action-requirement">{amount} <img src={icons[name]} class="icon" /></div>
@@ -57,6 +59,74 @@ export default function Actions() {
         </div>
       }}
     </For>
+    <AddAction />
   </div>
 }
 
+
+function AddAction() {
+  const resources = api.resources.get();
+
+  const [open, setOpen] = createSignal(false);
+  const [action, setAction] = createSignal<Action>({
+    name: 'my action',
+    desc: '${actor} did a thing.',
+    requires: {},
+  });
+
+  const saveAction = () => {
+    let a = action();
+    let id = slugify(a.name);
+    let actions = api.actions.get();
+    api.actions.set(update(actions, {
+      [id]: {$set: a}
+    }));
+    let h = [...api.history.get()];
+    h.push(`${api.player} added an action: "${a.name}".`);
+    api.history.set(h);
+    setOpen(false);
+  }
+
+  return <div class="add-action">
+    <Show when={open()} fallback={<div class="edit-action-button edit-rule-button" onClick={() => setOpen(true)}>Add Action</div>}>
+      <div>
+        <div><input name="name" type="text" placeholder="Action name"
+          value={action().name}
+          onInput={(ev) => {
+            setAction(update(action(), {
+              name: {$set: ev.currentTarget.value},
+            }));
+          }}
+          /></div>
+        <div><input name="desc" type="text" placeholder="Action description"
+          value={action().desc}
+          onInput={(ev) => {
+            setAction(update(action(), {
+              desc: {$set: ev.currentTarget.value},
+            }));
+          }}/></div>
+        <div class="add-action-requires">
+          Requires:
+          <For each={Object.keys(resources)}>
+            {(k) => {
+              return <div>
+                <label>{k}</label>
+                <input type="number"
+                  value={(action().requires || {})[k] || 0}
+                  onInput={(ev) => {
+                    let val = parseInt(ev.currentTarget.value) || 0;
+                    setAction(update(action(), {
+                      requires: {
+                        [k]: {$set: val}
+                      }
+                    }));
+                  }}/>
+              </div>
+            }}
+          </For>
+        </div>
+        <div class="edit-rule-button" onClick={saveAction}>Save</div>
+      </div>
+    </Show>
+  </div>
+}

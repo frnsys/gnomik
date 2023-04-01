@@ -24,6 +24,10 @@ body {
   padding: 1em;
 }
 
+select, input {
+  font-family: 'Argent Pixel CF', monospace;
+}
+
 header {
   display: flex;
   align-items: center;
@@ -132,9 +136,6 @@ img.icon {
   display: flex;
   margin: 0.5em 0;
 }
-.rule em {
-  margin: 0 0.5em;
-}
 
 .edit-rule {
   display: flex;
@@ -150,4 +151,24 @@ img.icon {
 .rule-wrapper {
   display: flex;
   align-items: center;
+}
+
+.add-action {
+  margin: 1em 0;
+}
+.add-action input {
+  width: 100%;
+  margin-bottom: 0.25em;
+}
+.edit-action-button {
+  margin: 0;
+}
+.add-action-requires input {
+  width: auto;
+}
+.add-action-requires div {
+  display: flex;
+}
+.add-action-requires label {
+  flex: 1;
 }

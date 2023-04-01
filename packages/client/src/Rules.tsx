@@ -1,7 +1,7 @@
 import api from './engine/api';
 import { numFmt } from "./format";
 import { icons } from './Resources';
-import { For, createSignal } from "solid-js";
+import { Show, For, createSignal } from "solid-js";
 import { Rule as RuleType, Condition as CondType, Consequence as ConsqType } from './engine/rules';
 import EditRule from './RuleEditor';
 import update from 'immutability-helper';
@@ -42,7 +42,7 @@ function Rule(props: {idx: number, rule: RuleType}) {
       </div>
     } else if (props.rule.type == 'action') {
       return <div class="rule">
-        When you <em>{actions[props.rule.action].name}</em>,&nbsp;<Consequence consq={props.rule.consequence} />
+        When you "<em>{actions[props.rule.action].name}</em>",&nbsp;<Consequence consq={props.rule.consequence} />
       </div>
     }
     return <div class="rule">(unknown rule)</div>
@@ -55,10 +55,18 @@ function Rule(props: {idx: number, rule: RuleType}) {
           [props.idx]: changes
         });
         api.rules.set(rules);
+
+        let h = [...api.history.get()];
+        h.push(`${api.player} changed a rule.`);
+        api.history.set(h);
+
+        setEditing(false);
       }} />
     } else {
       return <div class="rule-wrapper">{displayComponent()} <div class="edit-rule-button" onClick={() => {
-        setEditing(true);
+        if (tryPayResources({thoughts: 20})) {
+          setEditing(true);
+        }
       }}>Edit (20 <img src="/assets/img/thought.png" class="icon" />)</div></div>
     }
   }
@@ -75,5 +83,38 @@ export default function Rules() {
     <For each={rules()}>
       {(rule, i) => <Rule idx={i()} rule={rule} />}
     </For>
+    <AddRule />
+  </div>
+}
+
+function AddRule() {
+  const [open, setOpen] = createSignal(false);
+  const [rule, setRule] = createSignal<RuleType>({
+    type: 'conditional',
+    condition: {
+      name: 'energy',
+      operator: '>',
+      type: 'resource',
+      value: 0
+    },
+    consequence: {
+      type: 'loseResource',
+      name: 'energy',
+      value: 0,
+    }
+  });
+
+  return <div>
+    <Show when={open()} fallback={<div class="edit-action-button edit-rule-button" onClick={() => setOpen(true)}>Add Rule</div>}>
+      <EditRule rule={rule()} update={(changes) => {
+        let r = update(rule(), changes);
+        let rules = api.rules.get();
+        api.rules.set([...rules, r]);
+        let h = [...api.history.get()];
+        h.push(`${api.player} added a rule.`);
+        api.history.set(h);
+        setOpen(false);
+      }} />
+    </Show>
   </div>
 }

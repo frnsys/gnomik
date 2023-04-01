@@ -50,13 +50,3 @@ interface ChangeRateConsequence {
   name: ResourceName,
   value: number,
 }
-
-interface RevealActionConsequence {
-  type: 'revealAction',
-  name: ActionName,
-}
-
-interface RevealResourceConsequence {
-  type: 'revealConsequence',
-  name: ActionName,
-}
