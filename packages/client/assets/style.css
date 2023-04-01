@@ -1,0 +1,137 @@
+@font-face {
+    font-family: 'Argent Pixel CF';
+    src: url('/assets/fonts/ArgentPixelCF-Italic.woff2') format('woff2'),
+        url('/assets/fonts/ArgentPixelCF-Italic.woff') format('woff');
+    font-weight: normal;
+    font-style: italic;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Argent Pixel CF';
+    src: url('/assets/fonts/ArgentPixelCF-Regular.woff2') format('woff2'),
+        url('/assets/fonts/ArgentPixelCF-Regular.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+html {
+  font-family: 'Argent Pixel CF', monospace;
+  user-select: none;
+}
+body {
+  padding: 1em;
+}
+
+header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1em;
+  font-style: italic;
+}
+header img {
+  height: 24px;
+  margin-right: 6px;
+}
+
+h2 {
+  font-size: 1.1em;
+  font-weight: normal;
+  margin: 0;
+}
+
+.panels {
+  display: flex;
+  justify-content: space-between;
+}
+.panels > .panel {
+  width: 32%;
+}
+.panel h2 {
+  border-bottom: 1px solid #000;
+  margin: 0 0 0.5em 0;
+}
+
+.resource {
+  display: flex;
+  align-items: center;
+}
+.resource-name {
+  display: flex;
+  align-items: center;
+  flex: 1;
+}
+.resource-name img {
+  height: 16px;
+  margin-right: 5px;
+}
+.resource-rate {
+  color: #777;
+  margin-right: 0.5em;
+}
+
+.action {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+}
+.action:hover .action-name {
+  color: #eb1a22;
+  cursor: pointer;
+}
+.action:hover .choose-target {
+  display: block;
+}
+.action-requires {
+  display: flex;
+  align-items: center;
+  color: #777;
+}
+.action-requirement {
+  margin-left: 5px;
+  display: flex;
+  align-items: center;
+}
+
+img.icon {
+  height: 16px;
+}
+
+.choose-target {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  padding: 0.25em;
+  border: 1px solid #000;
+  border-radius: 3px;
+  display: none;
+  background: #fff;
+  z-index: 1;
+}
+.other-actor {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.other-actor-resources {
+  display: flex;
+  align-items: center;
+}
+.other-actor:hover {
+  color: #eb1a22;
+  cursor: pointer;
+}
+
+.rules {
+  margin-top: 2em;
+}
+.rule {
+  display: flex;
+  margin: 0.5em 0;
+}
+.rule em {
+  margin: 0 0.5em;
+}
