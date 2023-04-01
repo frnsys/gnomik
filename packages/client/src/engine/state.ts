@@ -114,6 +114,22 @@ export const initialState: State = {
       name: 'energy',
       value: 1,
     }
+  }, {
+    type: 'action',
+    action: 'gatherShroom',
+    consequence: {
+      type: 'gainResource',
+      name: 'mushrooms',
+      value: 1,
+    }
+  }, {
+    type: 'action',
+    action: 'buildShroomFarm',
+    consequence: {
+      type: 'changeRate',
+      name: 'mushrooms',
+      value: 1,
+    }
   }]
 }
 

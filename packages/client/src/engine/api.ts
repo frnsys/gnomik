@@ -34,10 +34,21 @@ function createAPI<K extends keyof State>(key: K) {
   }
 }
 
+const genRanHex = (size: number) => [...Array(size)].map(() => Math.floor(Math.random() * 16).toString(16)).join('');
+
 const api = {
   actions: createAPI('actions'),
   resources: createAPI('resources'),
   history: createAPI('history'),
   rules: createAPI('rules'),
+
+  player: genRanHex(8),
+  otherPlayers: [
+    genRanHex(8),
+    genRanHex(8),
+    genRanHex(8),
+    genRanHex(8),
+    genRanHex(8),
+  ]
 };
 export default api;

@@ -1,6 +1,6 @@
 import api from './api';
-import { Consequence } from './rules';
-import { Resources, ActionName } from './state';
+import { Condition, Consequence } from './rules';
+import { Resources, ResourceName, ActionName } from './state';
 import update, { Spec } from 'immutability-helper';
 
 // Take an action, applying any rules for it
@@ -10,21 +10,8 @@ export function tryTakeAction(key: ActionName): boolean {
   let actions = api.actions.get();
   let action = actions[key];
 
-  if (action.requires) {
-    let resources = api.resources.get();
-    let canAfford = Object.entries(action.requires).every(([k, amount]) => {
-      return resources[k].value >= amount;
-    });
-
-    if (!canAfford) return false;
-
-    // Pay resources
-    let updates: Spec<Resources> = {};
-    Object.entries(action.requires).every(([k, amount]) => {
-      (updates as any)[k] = {value: {$set: resources[k].value - amount}};
-    });
-    let newState = update(resources, updates);
-    api.resources.set(newState);
+  if (action.requires && !tryPayResources(action.requires)) {
+    return false;
   }
 
   // Find rules for this action
@@ -44,10 +31,10 @@ export function applyConsequence(conseq: Consequence) {
   let resources = api.resources.get();
   switch(conseq.type) {
     case 'win':
-      alert('you win'); // TODO
+      console.log('you win'); // TODO
       return;
     case 'die':
-      alert('you\'re dead'); // TODO
+      console.log('you\'re dead'); // TODO
       return;
     case 'gainResource':
       api.resources.set(update(resources, {
@@ -59,7 +46,30 @@ export function applyConsequence(conseq: Consequence) {
         [conseq.name]: {value: {$set: resources[conseq.name].value - conseq.value}}
       }));
       return;
+    case 'changeRate':
+      api.resources.set(update(resources, {
+        [conseq.name]: {rate: {$set: (resources[conseq.name].rate || 0) + conseq.value}}
+      }));
+      return;
   }
+}
+
+export function tryPayResources(requires: Record<ResourceName, number>): boolean {
+  let resources = api.resources.get();
+  let canAfford = Object.entries(requires).every(([k, amount]) => {
+    return resources[k].value >= amount;
+  });
+
+  if (!canAfford) return false;
+
+  // Pay resources
+  let updates: Spec<Resources> = {};
+  Object.entries(requires).every(([k, amount]) => {
+    (updates as any)[k] = {value: {$set: resources[k].value - amount}};
+  });
+  let newState = update(resources, updates);
+  api.resources.set(newState);
+  return true;
 }
 
 // Apply rate updates to resources
@@ -73,4 +83,31 @@ export function applyRates() {
   });
   let newState = update(resources, updates);
   api.resources.set(newState);
+}
+
+function checkCondition(cond: Condition): boolean {
+  let resources = api.resources.get();
+  switch (cond.type) {
+    case 'resource':
+      switch (cond.operator) {
+        case '==': return resources[cond.name].value == cond.value;
+        case '<=': return resources[cond.name].value <= cond.value;
+        case '>=': return resources[cond.name].value >= cond.value;
+        case '<': return resources[cond.name].value < cond.value;
+        case '>': return resources[cond.name].value > cond.value;
+      }
+  }
+}
+
+export function checkConditions() {
+  let rules = api.rules.get();
+  rules
+    .filter((rule) => rule.type == 'conditional')
+    .forEach((rule) => {
+      if (rule.type == 'conditional') {
+        if (checkCondition(rule.condition)) {
+          applyConsequence(rule.consequence);
+        }
+      }
+    });
 }

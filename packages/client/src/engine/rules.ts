@@ -1,4 +1,4 @@
-import { ResourceName } from "./state";
+import { ActionName, ResourceName } from "./state";
 
 export type Rule = ConditionalRule | ActionRule;
 
@@ -10,7 +10,7 @@ interface ConditionalRule {
 
 interface ActionRule {
   type: 'action',
-  action: string,
+  action: ActionName,
   consequence: Consequence,
 }
 
@@ -18,12 +18,12 @@ export type Condition = ResourceCondition;
 
 interface ResourceCondition {
   type: 'resource',
-  name: string,
+  name: ResourceName,
   operator: '==' | '<' | '>' | '<=' | '>='
   value: number,
 }
 
-export type Consequence = WinConsequence | DieConsequence | GainResourceConsequence | LoseResourceConsequence;
+export type Consequence = WinConsequence | DieConsequence | GainResourceConsequence | LoseResourceConsequence | ChangeRateConsequence;
 
 interface WinConsequence {
   type: 'win',
@@ -43,4 +43,20 @@ interface LoseResourceConsequence {
   type: 'loseResource',
   name: ResourceName,
   value: number,
+}
+
+interface ChangeRateConsequence {
+  type: 'changeRate',
+  name: ResourceName,
+  value: number,
+}
+
+interface RevealActionConsequence {
+  type: 'revealAction',
+  name: ActionName,
+}
+
+interface RevealResourceConsequence {
+  type: 'revealConsequence',
+  name: ActionName,
 }

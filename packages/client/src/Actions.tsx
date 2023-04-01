@@ -6,23 +6,13 @@ import { icons } from './Resources';
 import { tryTakeAction } from './engine/logic';
 
 const inject = (str: string, obj: Object) => str.replace(/\${(.*?)}/g, (x,g)=> obj[g]);
-const genRanHex = (size: number) => [...Array(size)].map(() => Math.floor(Math.random() * 16).toString(16)).join('');
-const actor = genRanHex(8);
-
-const otherActors = [
-  genRanHex(8),
-  genRanHex(8),
-  genRanHex(8),
-  genRanHex(8),
-  genRanHex(8),
-];
 
 export function ChooseActor(props: {
   onSelect: (actor: string) => void,
 }) {
   return <div class="choose-target">
     <h2>Choose Target</h2>
-    <For each={otherActors}>
+    <For each={api.otherPlayers}>
       {(actor) => {
         return <div class="other-actor" onClick={() => props.onSelect(actor)}>
           <div>{actor}</div>
@@ -42,7 +32,7 @@ export default function Actions() {
 
     if (tryTakeAction(action)) {
       let event = inject(actions()[action].desc, {
-        actor,
+        actor: api.player,
         target
       });
       h.push(event);

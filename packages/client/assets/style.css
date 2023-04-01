@@ -135,3 +135,19 @@ img.icon {
 .rule em {
   margin: 0 0.5em;
 }
+
+.edit-rule {
+  display: flex;
+}
+.edit-rule-button {
+  color: #777;
+  cursor: pointer;
+  margin-left: 0.5em;
+}
+.edit-rule-button:hover {
+  color: #eb1a22;
+}
+.rule-wrapper {
+  display: flex;
+  align-items: center;
+}
