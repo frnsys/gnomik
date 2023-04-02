@@ -1,6 +1,6 @@
 import { ActionName, ResourceName } from "./state";
 
-export type Rule = ConditionalRule | ActionRule;
+export type Rule = ConditionalRule | ActionRule | RateRule | CapacityRule | RevealRule;
 
 interface ConditionalRule {
   type: 'conditional',
@@ -14,6 +14,37 @@ interface ActionRule {
   consequence: Consequence,
 }
 
+interface ResourceTarget {
+  type: 'resource',
+  name: ResourceName,
+}
+interface ActionTarget {
+  type: 'action',
+  name: ActionName,
+}
+
+// When basis >= value, reveal that resource
+export interface RevealRule {
+  type: 'reveal',
+  target: ResourceTarget|ActionTarget
+  basis: ResourceName,
+  value: number,
+}
+
+interface RateRule {
+  type: 'rate',
+  resource: ResourceName,
+  basis: ResourceName,
+  value: number,
+}
+
+export interface CapacityRule {
+  type: 'capacity',
+  resource: ResourceName,
+  basis: ResourceName,
+  value: number,
+}
+
 export type Condition = ResourceCondition;
 
 interface ResourceCondition {
@@ -23,7 +54,7 @@ interface ResourceCondition {
   value: number,
 }
 
-export type Consequence = WinConsequence | DieConsequence | GainResourceConsequence | LoseResourceConsequence | ChangeRateConsequence;
+export type Consequence = WinConsequence | DieConsequence | GainResourceConsequence | LoseResourceConsequence;
 
 interface WinConsequence {
   type: 'win',
@@ -41,12 +72,6 @@ interface GainResourceConsequence {
 
 interface LoseResourceConsequence {
   type: 'loseResource',
-  name: ResourceName,
-  value: number,
-}
-
-interface ChangeRateConsequence {
-  type: 'changeRate',
   name: ResourceName,
   value: number,
 }

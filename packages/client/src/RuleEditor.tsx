@@ -67,8 +67,6 @@ function EditConsequence(props: {
       return `gain-${props.consq.name}`;
     } else if (props.consq.type == 'loseResource') {
       return `lose-${props.consq.name}`;
-    } else if (props.consq.type == 'changeRate') {
-      return `rate-${props.consq.name}`;
     } else {
       return props.consq.type;
     }
@@ -82,12 +80,6 @@ function EditConsequence(props: {
         if (changeType == 'gain') {
           props.update({
             type: {$set: 'gainResource'},
-            name: {$set: resourceName},
-            value: {$set: 0},
-          });
-        } else if (changeType == 'rate') {
-          props.update({
-            type: {$set: 'changeRate'},
             name: {$set: resourceName},
             value: {$set: 0},
           });

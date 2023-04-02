@@ -21,11 +21,9 @@ function Consequence(props: {consq: ConsqType}) {
   } else if (props.consq.type == 'die') {
     return <div class="consequence">you die.</div>
   } else if (props.consq.type == 'gainResource') {
-    return <div class="consequence">you gain <img src={icons[props.consq.name]} class="icon" />{numFmt(props.consq.value)}.</div>
+    return <div class="consequence">you gain <img src={icons[props.consq.name]} class="icon" />{numFmt(props.consq.value)} {props.consq.name}.</div>
   } else if (props.consq.type == 'loseResource') {
-    return <div class="consequence">you lose <img src={icons[props.consq.name]} class="icon" />{numFmt(props.consq.value)}.</div>
-  } else if (props.consq.type == 'changeRate') {
-    return <div class="consequence">your <img src={icons[props.consq.name]} class="icon" /> production rate changes by {numFmt(props.consq.value)}.</div>
+    return <div class="consequence">you lose <img src={icons[props.consq.name]} class="icon" />{numFmt(props.consq.value)} {props.consq.name}.</div>
   }
   return <div class="condition">(unknown consequence)</div>
 }
@@ -44,6 +42,18 @@ function Rule(props: {idx: number, rule: RuleType}) {
       return <div class="rule">
         When you "<em>{actions[props.rule.action].name}</em>",&nbsp;<Consequence consq={props.rule.consequence} />
       </div>
+    } else if (props.rule.type == 'rate') {
+      return <div class="rule">
+        For each of your {props.rule.basis} you gain {props.rule.value} {props.rule.resource}.
+      </div>
+    } else if (props.rule.type == 'capacity') {
+      return <div class="rule">
+        You are limited to {props.rule.value} {props.rule.resource} for each of your {props.rule.basis}.
+      </div>
+    } else if (props.rule.type == 'reveal') {
+      return <div class="rule">
+        "{props.rule.target.name}" is hidden until {props.rule.basis} reaches {props.rule.value}.
+      </div>
     }
     return <div class="rule">(unknown rule)</div>
   }
@@ -58,6 +68,7 @@ function Rule(props: {idx: number, rule: RuleType}) {
 
         let h = [...api.history.get()];
         h.push(`${api.player} changed a rule.`);
+        h.push(`The gnomes are unhappy that you changed a rule.`);
         api.history.set(h);
 
         setEditing(false);

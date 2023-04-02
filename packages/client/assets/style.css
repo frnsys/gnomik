@@ -17,6 +17,7 @@
 }
 
 html {
+  background: #fff4e5;
   font-family: 'Argent Pixel CF', monospace;
   user-select: none;
 }
@@ -73,6 +74,9 @@ h2 {
 .resource-rate {
   color: #777;
   margin-right: 0.5em;
+}
+.resource-limit {
+  color: #777;
 }
 
 .action {

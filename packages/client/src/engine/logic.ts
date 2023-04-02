@@ -1,7 +1,7 @@
 import api from './api';
-import { Condition, Consequence } from './rules';
-import { Resources, ResourceName, ActionName } from './state';
 import update, { Spec } from 'immutability-helper';
+import { Resources, ResourceName, ActionName } from './state';
+import { Condition, Consequence, CapacityRule, RevealRule } from './rules';
 
 // Take an action, applying any rules for it
 // Returns true if action was successfully taken
@@ -37,18 +37,15 @@ export function applyConsequence(conseq: Consequence) {
       console.log('you\'re dead'); // TODO
       return;
     case 'gainResource':
+      let limit = limitForResource(conseq.name);
+      let amount = resources[conseq.name].value + conseq.value;
       api.resources.set(update(resources, {
-        [conseq.name]: {value: {$set: resources[conseq.name].value + conseq.value}}
+        [conseq.name]: {value: {$set: limit !== null ? Math.min(amount, limit) : amount}}
       }));
       return;
     case 'loseResource':
       api.resources.set(update(resources, {
         [conseq.name]: {value: {$set: resources[conseq.name].value - conseq.value}}
-      }));
-      return;
-    case 'changeRate':
-      api.resources.set(update(resources, {
-        [conseq.name]: {rate: {$set: (resources[conseq.name].rate || 0) + conseq.value}}
       }));
       return;
   }
@@ -72,13 +69,67 @@ export function tryPayResources(requires: Record<ResourceName, number>): boolean
   return true;
 }
 
+// Calculate rate for resource
+export function rateForResource(name: ResourceName): number {
+  let rules = api.rules.get();
+  let resources = api.resources.get();
+  let rate = rules
+    .reduce((acc, rule) => {
+      if (rule.type == 'rate' && rule.resource == name) {
+        return acc + rule.value * resources[rule.basis].value;
+      } else {
+        return acc;
+      }
+    }, 0);
+  return rate;
+}
+
+export function limitForResource(name: ResourceName): number|null {
+  let rules = api.rules.get();
+  let resources = api.resources.get();
+  let relevantRules = rules
+    .filter((rule) => rule.type == 'capacity' && rule.resource == name) as CapacityRule[];
+
+  // No limit
+  if (relevantRules.length === 0) return null;
+
+  return relevantRules.reduce((acc, rule) => {
+    return acc + rule.value * resources[rule.basis].value;
+  }, 0);
+}
+
+export function visibilityForResource(name: ResourceName): boolean {
+  let rules = api.rules.get();
+  let relevantRules = rules
+    .filter((rule) => rule.type == 'reveal' && rule.target.type == 'resource' && rule.target.name == name) as RevealRule[];
+
+  if (relevantRules.length == 0) return true;
+
+  let resources = api.resources.get();
+  return relevantRules.every((rule) => resources[rule.basis].value >= rule.value);
+}
+
+export function visibilityForAction(name: ActionName): boolean {
+  let rules = api.rules.get();
+  let relevantRules = rules
+    .filter((rule) => rule.type == 'reveal' && rule.target.type == 'action' && rule.target.name == name) as RevealRule[];
+
+  if (relevantRules.length == 0) return true;
+
+  let resources = api.resources.get();
+  return relevantRules.every((rule) => resources[rule.basis].value >= rule.value);
+}
+
 // Apply rate updates to resources
 export function applyRates() {
   let updates: Spec<Resources> = {};
   let resources = api.resources.get();
   Object.entries(resources).forEach(([k, d]) => {
-    if (d.rate !== null) {
-      (updates as any)[k] = {value: {$set: d.value + d.rate}};
+    let rate = rateForResource(k);
+    if (rate !== 0) {
+      let limit = limitForResource(k);
+      let amount = d.value + rate;
+      (updates as any)[k] = {value: {$set: limit !== null ? Math.min(amount, limit) : amount}};
     }
   });
   let newState = update(resources, updates);

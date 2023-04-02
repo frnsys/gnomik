@@ -4,7 +4,7 @@ import { numFmt } from './format';
 import { Action, ActionName } from './engine/state';
 import { Show, For, createSignal } from 'solid-js';
 import { icons } from './Resources';
-import { tryTakeAction } from './engine/logic';
+import { tryTakeAction, visibilityForAction } from './engine/logic';
 import update from 'immutability-helper';
 
 const inject = (str: string, obj: Object) => str.replace(/\${(.*?)}/g, (x,g)=> obj[g]);
@@ -29,6 +29,9 @@ export default function Actions() {
   const [actions, setActions] = createSignal(api.actions.get());
   api.actions.subscribe(setActions);
 
+  const visibleActions = () => Object.entries(actions())
+    .filter(([name, _r]) => visibilityForAction(name));
+
   const doAction = (action: ActionName, target?: string) => {
     let h = [...api.history.get()];
 
@@ -44,7 +47,7 @@ export default function Actions() {
 
   return <div class="panel actions">
     <h2>Actions</h2>
-    <For each={Object.entries(actions())}>
+    <For each={visibleActions()}>
       {([name, data]) => {
         return <div class="action" onClick={() => !data.targeted && doAction(name)}>
           <div class="action-name">{data.name}</div>
