@@ -18,7 +18,7 @@ export function ChooseActor(props: {
       {(actor) => {
         return <div class="other-actor" onClick={() => props.onSelect(actor)}>
           <div>{actor}</div>
-          <div class="other-actor-resources">{numFmt(12379)}<img src="/assets/img/mushroom.png" class="icon" /></div>
+          <div class="other-actor-resources">{numFmt(12379)}<img src="assets/img/mushroom.png" class="icon" /></div>
         </div>
       }}
     </For>

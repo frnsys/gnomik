@@ -5,15 +5,15 @@ import { For, createSignal } from 'solid-js';
 import { rateForResource, limitForResource, visibilityForResource } from './engine/logic';
 
 export const icons: Record<ResourceName, string> = {
-  energy: "/assets/img/energy.png",
-  thoughts: "/assets/img/thought.png",
-  hamburgers: "/assets/img/hamburger.png",
-  kitchens: "/assets/img/hamburger.png",
-  mushrooms: "/assets/img/mushroom.png",
-  shroomFarms: "/assets/img/mushroom.png",
-  shroomFarmers: "/assets/img/gnome.png",
-  gnomeDiscontent: "/assets/img/gnome.png",
-  cooks: "/assets/img/gnome.png",
+  energy: "assets/img/energy.png",
+  thoughts: "assets/img/thought.png",
+  hamburgers: "assets/img/hamburger.png",
+  kitchens: "assets/img/hamburger.png",
+  mushrooms: "assets/img/mushroom.png",
+  shroomFarms: "assets/img/mushroom.png",
+  shroomFarmers: "assets/img/gnome.png",
+  gnomeDiscontent: "assets/img/gnome.png",
+  cooks: "assets/img/gnome.png",
 }
 
 export default function Resources() {

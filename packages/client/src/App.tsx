@@ -12,7 +12,7 @@ function App() {
 
   return <div>
     <header>
-      <img src="/assets/gnome.png" /> gnomik
+      <img src="assets/gnome.png" /> gnomik
     </header>
     <div class="panels">
       <Resources />

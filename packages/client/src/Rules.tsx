@@ -78,7 +78,7 @@ function Rule(props: {idx: number, rule: RuleType}) {
         if (tryPayResources({thoughts: 20})) {
           setEditing(true);
         }
-      }}>Edit (20 <img src="/assets/img/thought.png" class="icon" />)</div></div>
+      }}>Edit (20 <img src="assets/img/thought.png" class="icon" />)</div></div>
     }
   }
 
